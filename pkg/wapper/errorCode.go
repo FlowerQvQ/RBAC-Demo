@@ -1,0 +1,51 @@
+package wapper
+
+type ErrorCode struct {
+	Code    int
+	Message string
+}
+
+var (
+	//公共模块
+
+	Success                = ErrorCode{Code: 10100, Message: "成功"}
+	InternalServer         = ErrorCode{Code: 10001, Message: "系统内部错误"}
+	ParameterMissing       = ErrorCode{Code: 10002, Message: "参数缺失"}
+	ParameterFormat        = ErrorCode{Code: 10003, Message: "参数格式错误"}
+	AuthenticationFailed   = ErrorCode{Code: 10004, Message: "认证失败（Token无效/过期）"}
+	InsufficientAuthority  = ErrorCode{Code: 10005, Message: "权限不足"}
+	DataNotFound           = ErrorCode{Code: 10006, Message: "数据未找到"}
+	ParameterBindingFailed = ErrorCode{Code: 10007, Message: "参数绑定失败"}
+
+	//用户模块
+	//注册模块
+	RegisterFailed           = ErrorCode{Code: 20001, Message: "用户注册失败"}
+	UsernameExisted          = ErrorCode{Code: 20002, Message: "用户已存在"}
+	EmailExisted             = ErrorCode{Code: 20003, Message: "邮箱已存在"}
+	PasswordEncryptionFailed = ErrorCode{Code: 20012, Message: "密码加密失败"}
+	//登录模块
+	UserNotFound          = ErrorCode{Code: 20004, Message: "用户不存在"}
+	UsernameOrEmailIsNull = ErrorCode{Code: 200014, Message: "用户名或邮箱不能为空"}
+	LoginFailed           = ErrorCode{Code: 20005, Message: "用户登录失败"}
+	PasswordError         = ErrorCode{Code: 20006, Message: "密码错误"}
+	NotBeenActivated      = ErrorCode{Code: 20007, Message: "用户未被激活"}
+	//用户列表模块
+	GetUserListFailed = ErrorCode{Code: 20009, Message: "用户列表获取失败"}
+	//用户查询模块
+	GetUserInfoFailed = ErrorCode{Code: 200013, Message: "用户信息查询失败"}
+	//用户信息更新模块
+	UpdateUserFailed           = ErrorCode{Code: 20010, Message: "用户信息更新失败"}
+	UserInformationDiscrepancy = ErrorCode{Code: 20011, Message: "用户不一致"}
+
+	//资源模块
+	GetResourceListFailed = ErrorCode{Code: 30001, Message: "资源列表获取失败"}
+	AddResourceFailed     = ErrorCode{Code: 30002, Message: "资源创建失败"}
+
+	//角色模块
+	AddRoleFailed = ErrorCode{Code: 40001, Message: "角色创建失败"}
+	//角色-资源模块
+	RoleResourceBindFailed = ErrorCode{Code: 50001, Message: "角色资源绑定失败"}
+	AddRoleResourceFailed  = ErrorCode{Code: 50002, Message: "角色资源添加失败"}
+	//用户-角色模块
+	AddUserRoleFailed = ErrorCode{Code: 50001, Message: "角色资源添加失败"}
+)

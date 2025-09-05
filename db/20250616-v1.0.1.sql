@@ -1,0 +1,68 @@
+CREATE DATABASE NewProject;
+use NewProject;
+-- 用户表
+CREATE TABLE `user` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+    `username` VARCHAR(64) NOT NULL COMMENT '用户名',
+    `password_hash` VARBINARY(128) NOT NULL COMMENT '加密密码',
+    `email` VARCHAR(128) NOT NULL COMMENT '邮箱',
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '账户状态：1启用/2禁用',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '更新人',
+    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `udx_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+-- 角色表（应该是角色权限）
+CREATE TABLE `role` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '角色ID',
+    `name` VARCHAR(32) NOT NULL COMMENT '角色名称',
+    `description` VARCHAR(255) NULL COMMENT '角色描述',
+    `is_system` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '系统内置角色：1是/2否',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '更新人',
+    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `udx_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
+-- 资源表（应该是资源权限）
+CREATE TABLE `resource` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '资源ID',
+    `name` VARCHAR(64) NOT NULL COMMENT '资源名称', -- eg：管理菜单、删除按钮等
+    `description` VARCHAR(255) NULL COMMENT '资源描述',
+    `path` VARCHAR(255) NOT NULL COMMENT '资源地址', -- eg：/api/v1/users
+    `type` TINYINT NOT NULL DEFAULT '0' COMMENT '资源类型:1菜单、2按钮、3无菜单路由',
+    `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：1启用/2禁用',
+    `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+    `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '更新人',
+    `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `udx_path` (`path`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资源表';
+-- 用户-角色表
+CREATE TABLE `user_role` (
+     `id` INT UNSIGNED NOT NULL PRIMARY KEY COMMENT 'ID',
+     `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+     `role_id` INT UNSIGNED NOT NULL COMMENT '角色ID',
+     `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：1启用/2禁用',
+     `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+     `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '更新人',
+     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间'
+    -- PRIMARY KEY (`user_id`, `role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色绑定表';
+-- 角色-资源表
+CREATE TABLE `role_resource` (
+     `id` INT UNSIGNED NOT NULL PRIMARY KEY COMMENT 'ID',
+     `role_id` INT UNSIGNED NOT NULL COMMENT '角色ID',
+     `resource_id` INT UNSIGNED NOT NULL COMMENT '资源ID',
+     `status` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态：1启用/2禁用',
+     `created_by` BIGINT UNSIGNED NOT NULL COMMENT '创建人',
+     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+     `updated_by` BIGINT UNSIGNED NOT NULL COMMENT '更新人',
+     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间'
+    -- PRIMARY KEY (`role_id`, `resource_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色资源权限表';

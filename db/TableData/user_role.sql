@@ -1,0 +1,3 @@
+INSERT INTO `user_role`(`id`, `user_id`, `role_id`, `status`, `created_by`, `created_at`, `updated_by`, `updated_at`) VALUES (1, 1, 1, 1, 'sai', '2025-09-04 03:28:51.329', 'sai', '2025-09-04 03:28:51.329');
+INSERT INTO `user_role`(`id`, `user_id`, `role_id`, `status`, `created_by`, `created_at`, `updated_by`, `updated_at`) VALUES (2, 2, 2, 1, '赛', '2025-09-04 03:29:44.353', '赛', '2025-09-04 03:29:44.353');
+INSERT INTO `user_role`(`id`, `user_id`, `role_id`, `status`, `created_by`, `created_at`, `updated_by`, `updated_at`) VALUES (3, 1, 1, 1, '糖', '2025-09-04 16:26:34.391', '', '2025-09-04 16:26:34.391');

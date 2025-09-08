@@ -50,6 +50,7 @@ func (a *App) SetRouters(group *gin.RouterGroup) {
 	//用户--角色绑定
 	userRoleGroup := group.Group("/userRoleOperation")
 	userRoleGroup.POST("addUserRole", a.UserRoleService.AddUserRole)
+	userRoleGroup.GET("userOwnedResource", a.UserRoleService.UserOwnedResource)
 }
 
 func InitGenEngine(app *App) *gin.Engine {

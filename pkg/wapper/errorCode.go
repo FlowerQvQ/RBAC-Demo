@@ -48,4 +48,7 @@ var (
 	AddRoleResourceFailed  = ErrorCode{Code: 50002, Message: "角色资源添加失败"}
 	//用户-角色模块
 	AddUserRoleFailed = ErrorCode{Code: 50001, Message: "角色资源添加失败"}
+
+	//用户拥有的角色权限列表
+	GrtUserResourceFailed = ErrorCode{Code: 60001, Message: "角色资源查询失败"}
 )

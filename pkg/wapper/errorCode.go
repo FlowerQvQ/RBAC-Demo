@@ -12,7 +12,6 @@ var (
 	InternalServer         = ErrorCode{Code: 10001, Message: "系统内部错误"}
 	ParameterMissing       = ErrorCode{Code: 10002, Message: "参数缺失"}
 	ParameterFormat        = ErrorCode{Code: 10003, Message: "参数格式错误"}
-	AuthenticationFailed   = ErrorCode{Code: 10004, Message: "认证失败（Token无效/过期）"}
 	InsufficientAuthority  = ErrorCode{Code: 10005, Message: "权限不足"}
 	DataNotFound           = ErrorCode{Code: 10006, Message: "数据未找到"}
 	ParameterBindingFailed = ErrorCode{Code: 10007, Message: "参数绑定失败"}
@@ -59,4 +58,9 @@ var (
 
 	//用户拥有的角色权限列表
 	GrtUserResourceFailed = ErrorCode{Code: 70001, Message: "查询角色拥有的资源失败"}
+
+	//jwt错误码
+	TokenIsNull          = ErrorCode{Code: 80001, Message: "Token为空"}
+	AuthenticationFailed = ErrorCode{Code: 80002, Message: "认证失败（Token无效/过期）"}
+	PayLoadParsingFailed = ErrorCode{Code: 80003, Message: "载荷解析失败"}
 )

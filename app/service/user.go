@@ -138,5 +138,3 @@ func (s *UserService) DelUser(c *gin.Context) {
 	}
 	wapper.ResSuccess(c, "删除成功")
 }
-
-//增加了查询用户拥有的资源列表功能，并把路径信息单独摘出来和查询到的资源信息一起输出；

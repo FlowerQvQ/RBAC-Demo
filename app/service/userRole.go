@@ -33,6 +33,25 @@ func (s *UserRoleService) AddUserRole(c *gin.Context) {
 	wapper.ResSuccess(c, addUserRoleData)
 }
 
+// 查询用户拥有的角色列表
+func (s *UserRoleService) UserOwnedRole(c *gin.Context) {
+	var (
+		userId scheme.GetUserOwnedRoleReq
+		err    error
+	)
+	err = c.ShouldBindJSON(&userId)
+	if err != nil {
+		wapper.ResError(c, wapper.ParameterBindingFailed)
+		return
+	}
+	userOwnedRoleData, errCode := s.userRoleBiz.UserOwnedRole(userId)
+	if errCode != wapper.Success {
+		wapper.ResError(c, errCode)
+		return
+	}
+	wapper.ResSuccess(c, userOwnedRoleData)
+}
+
 // 查询用户拥有的资源列表
 func (s *UserRoleService) UserOwnedResource(c *gin.Context) {
 	var (

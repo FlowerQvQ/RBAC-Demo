@@ -39,7 +39,24 @@ func (s *ResourceService) GetResourceList(c *gin.Context) {
 	wapper.ResSuccess(c, resourceList)
 }
 
-//查询资源
+// 查询资源
+func (s *ResourceService) GetResource(c *gin.Context) {
+	var (
+		getResourceReq scheme.ResourceGetReq
+		err            error
+	)
+	err = c.ShouldBindJSON(&getResourceReq)
+	if err != nil {
+		wapper.ResError(c, wapper.ParameterBindingFailed)
+		return
+	}
+	resourceInfo, errCode := s.ResourceBiz.GetResource(getResourceReq)
+	if errCode != wapper.Success {
+		wapper.ResError(c, wapper.GetResourceFailed)
+		return
+	}
+	wapper.ResSuccess(c, resourceInfo)
+}
 
 // 增加资源
 func (s *ResourceService) CreateResource(c *gin.Context) {
@@ -63,6 +80,40 @@ func (s *ResourceService) CreateResource(c *gin.Context) {
 
 }
 
-//更新资源
+// 更新资源
+func (s *ResourceService) UpdateResource(c *gin.Context) {
+	var (
+		updateResourceReq scheme.ResourceUpdateReq
+		err               error
+	)
+	err = c.ShouldBindJSON(&updateResourceReq)
+	if err != nil {
+		wapper.ResError(c, wapper.ParameterBindingFailed)
+		return
+	}
+	updateResourceData, errCode := s.ResourceBiz.UpdateResource(updateResourceReq)
+	if errCode != wapper.Success {
+		wapper.ResError(c, wapper.UpdateResourceFailed)
+		return
+	}
+	wapper.ResSuccess(c, updateResourceData)
+}
 
-//删除资源
+// 删除资源
+func (s *ResourceService) DelResource(c *gin.Context) {
+	var (
+		resourceId scheme.ResourceDelReq
+		err        error
+	)
+	err = c.ShouldBindJSON(&resourceId)
+	if err != nil {
+		wapper.ResError(c, wapper.ParameterBindingFailed)
+		return
+	}
+	errCode := s.ResourceBiz.DelResource(resourceId)
+	if errCode != wapper.Success {
+		wapper.ResError(c, wapper.DelResourceFailed)
+		return
+	}
+	wapper.ResSuccess(c, "删除成功")
+}

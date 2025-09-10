@@ -26,6 +26,15 @@ func (b *UserRoleBiz) AddUserRole(addUserRole scheme.AddUserRoleReq) ([]models.U
 	return addUserRoleData, wapper.Success
 }
 
+// 查询用户拥有的角色列表
+func (b *UserRoleBiz) UserOwnedRole(userId scheme.GetUserOwnedRoleReq) ([]models.UserRole, wapper.ErrorCode) {
+	userOwnedRoleData, errCode := b.userRoleData.UserOwnedRole(userId)
+	if errCode != wapper.Success {
+		return nil, errCode
+	}
+	return userOwnedRoleData, wapper.Success
+}
+
 // 查询用户拥有的资源列表
 func (b *UserRoleBiz) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme.UserOwnedResourceResp, wapper.ErrorCode) {
 	UserOwnedResourceData, err := b.userRoleData.UserOwnedResource(userId)

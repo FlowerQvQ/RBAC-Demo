@@ -119,3 +119,24 @@ func (s *UserService) UpdateUser(c *gin.Context) {
 	}
 	wapper.ResSuccess(c, newUpdateInfo)
 }
+
+// 删除用户
+func (s *UserService) DelUser(c *gin.Context) {
+	var (
+		userId scheme.DelUserReq
+		err    error
+	)
+	err = c.ShouldBindJSON(&userId)
+	if err != nil {
+		wapper.ResError(c, wapper.ParameterBindingFailed)
+		return
+	}
+	errCode := s.UserBiz.DelUser(userId)
+	if errCode != wapper.Success {
+		wapper.ResError(c, errCode)
+		return
+	}
+	wapper.ResSuccess(c, "删除成功")
+}
+
+//增加了查询用户拥有的资源列表功能，并把路径信息单独摘出来和查询到的资源信息一起输出；

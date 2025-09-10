@@ -171,3 +171,12 @@ func (b *UserBiz) UpdateUser(updateReq scheme.UserUpdateReq) (models.User, wappe
 	}
 	return userUpdateResp, wapper.Success
 }
+
+// 删除用户
+func (b *UserBiz) DelUser(userId scheme.DelUserReq) wapper.ErrorCode {
+	err := b.UserData.DelUser(userId)
+	if err != nil {
+		return wapper.DelUserFailed
+	}
+	return wapper.Success
+}

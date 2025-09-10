@@ -3,6 +3,7 @@ package data
 import (
 	"NewProject/app/scheme"
 	"NewProject/models"
+	"NewProject/pkg/wapper"
 )
 
 type UserRoleData struct {
@@ -34,6 +35,18 @@ func (d *UserRoleData) AddUserRole(addUserRole scheme.AddUserRoleReq) ([]models.
 		return nil, err
 	}
 	return addUserRoleData, nil
+}
+
+// 查询用户拥有的角色列表
+func (D *UserRoleData) UserOwnedRole(userId scheme.GetUserOwnedRoleReq) ([]models.UserRole, wapper.ErrorCode) {
+	var (
+		userOwnedRoleData []models.UserRole
+	)
+	err := D.DB.DBClient.Model(&models.UserRole{}).Where("user_id = ?", userId.UserId).Find(&userOwnedRoleData).Error
+	if err != nil {
+		return nil, wapper.GetUserRoleFailed
+	}
+	return userOwnedRoleData, wapper.Success
 }
 
 // 查询用户拥有的资源列表

@@ -43,6 +43,7 @@ type Role struct {
 	Name        string `gorm:"column:name" json:"name"`
 	Description string `gorm:"column:description" json:"description"`
 	//IsSystem    int       `gorm:"column:is_system" json:"is_system"`
+	Status    int       `gorm:"column:status" json:"status"`
 	CreatedBy string    `gorm:"column:created_by" json:"created_by"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 	UpdatedBy string    `gorm:"column:updated_by" json:"updated_by"`
@@ -71,7 +72,9 @@ func (RoleResource) TableName() string {
 type UserRole struct {
 	Id        int       `gorm:"column:id" json:"id"`
 	UserId    int       `gorm:"column:user_id" json:"user_id"`
+	UserName  string    `gorm:"column:user_name" json:"user_name"`
 	RoleId    int       `gorm:"column:role_id" json:"role_id"`
+	RoleName  string    `gorm:"column:role_name" json:"role_name"`
 	Status    int       `gorm:"column:status" json:"status"`
 	CreatedBy string    `gorm:"column:created_by" json:"created_by"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`

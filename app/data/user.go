@@ -150,3 +150,13 @@ func (d *UserData) GetInfoByEmailOrUsername(emailOrUsername string) (models.User
 	}
 	return user, nil
 }
+
+// 删除用户
+func (d *UserData) DelUser(userId scheme.DelUserReq) error {
+
+	err := d.DB.DBClient.Model(&models.User{}).Where("id = ?", userId.Id).Update("is_active", scheme.UserInActive).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

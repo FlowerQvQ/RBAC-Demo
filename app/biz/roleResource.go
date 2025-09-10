@@ -17,10 +17,20 @@ func NewRoleResourceBiz(roleResourceData *data.RoleResourceData) *RoleResourceBi
 	}
 }
 
+// 角色资源绑定
 func (b *RoleResourceBiz) RoleResourceBind(AddRoleResourceBind scheme.AddRoleResourceReq) ([]models.RoleResource, wapper.ErrorCode) {
 	bindData, errCode := b.RoleResourceData.RoleResourceBind(AddRoleResourceBind)
 	if errCode != nil {
 		return nil, wapper.RoleResourceBindFailed
 	}
 	return bindData, wapper.Success
+}
+
+// 查询角色拥有的资源列表
+func (b *RoleResourceBiz) GetRoleOwnedResourceList(roleId scheme.RoleOwnedResourceListReq) ([]models.RoleResource, wapper.ErrorCode) {
+	roleOwnedResourceData, errCode := b.RoleResourceData.GetRoleOwnedResourceList(roleId)
+	if errCode != wapper.Success {
+		return nil, wapper.GetRoleResourceFailed
+	}
+	return roleOwnedResourceData, wapper.Success
 }

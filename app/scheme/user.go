@@ -10,6 +10,12 @@ const (
 	UserInActive = 2
 )
 
+// 分页
+type Pagination struct {
+	Page  int `json:"page" binding:"min=1"`  //请求的页码
+	Limit int `json:"limit" binding:"min=1"` //每页的数量
+}
+
 // 用户注册
 type UserRegisterReq struct {
 	Username     string `json:"username" binding:"required"`
@@ -21,12 +27,6 @@ type UserRegisterReq struct {
 type UserLoginReq struct {
 	LoginName    string `json:"login_name" binding:"required"` //账号和密码--2选1
 	PasswordHash string `json:"password_hash" binding:"required,min=8,max=16"`
-}
-
-// 分页
-type Pagination struct {
-	Page  int `json:"page" binding:"min=1"`  //请求的页码
-	Limit int `json:"limit" binding:"min=1"` //每页的数量
 }
 
 // 查询用户列表
@@ -65,4 +65,9 @@ type UserUpdateResp struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedBy    string    `json:"updated_by"`
 	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// 删除用户
+type DelUserReq struct {
+	Id int64 `json:"id" binding:"required"`
 }

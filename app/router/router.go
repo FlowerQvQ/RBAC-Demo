@@ -37,19 +37,29 @@ func (a *App) SetRouters(group *gin.RouterGroup) {
 	userGroup.GET("/getUserList", a.UserService.GetUserList)
 	userGroup.GET("/getUserInfo", a.UserService.GetUserInfo)
 	userGroup.PUT("/updateUser", a.UserService.UpdateUser)
+	userGroup.DELETE("/delUser", a.UserService.DelUser)
 	//资源路由
 	resourceGroup := group.Group("/resourceOperation")
 	resourceGroup.GET("/getResourceList", a.ResourceService.GetResourceList)
+	resourceGroup.GET("/getResource", a.ResourceService.GetResource)
 	resourceGroup.POST("/createResource", a.ResourceService.CreateResource)
+	resourceGroup.PUT("/updateResource", a.ResourceService.UpdateResource)
+	resourceGroup.DELETE("/deleteResource", a.ResourceService.DelResource)
 	//角色路由
 	roleGroup := group.Group("/roleOperation")
 	roleGroup.POST("addRole", a.RoleService.AddRole)
+	roleGroup.GET("getRole", a.RoleService.GetRole)
+	roleGroup.GET("getRoleList", a.RoleService.GetRoleList)
+	roleGroup.PUT("updateRole", a.RoleService.UpdateRole)
+	roleGroup.DELETE("delRole", a.RoleService.DelRole)
 	//角色--资源绑定
 	roleResourceGroup := group.Group("/roleResourceBindOperation")
 	roleResourceGroup.POST("addRoleResourceBind", a.RoleResourceService.RoleResourceBind)
+	roleResourceGroup.GET("getRoleOwnedResourceList", a.RoleResourceService.GetRoleOwnedResourceList)
 	//用户--角色绑定
 	userRoleGroup := group.Group("/userRoleOperation")
 	userRoleGroup.POST("addUserRole", a.UserRoleService.AddUserRole)
+	userRoleGroup.GET("userOwnedRole", a.UserRoleService.UserOwnedRole)
 	userRoleGroup.GET("userOwnedResource", a.UserRoleService.UserOwnedResource)
 }
 

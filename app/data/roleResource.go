@@ -3,6 +3,7 @@ package data
 import (
 	"NewProject/app/scheme"
 	"NewProject/models"
+	"NewProject/pkg/wapper"
 )
 
 type RoleResourceData struct {
@@ -34,5 +35,14 @@ func (d *RoleResourceData) RoleResourceBind(AddRoleResourceBind scheme.AddRoleRe
 		return nil, err
 	}
 	return bindData, nil
+}
 
+// 查询角色拥有的资源列表
+func (d *RoleResourceData) GetRoleOwnedResourceList(roleId scheme.RoleOwnedResourceListReq) ([]models.RoleResource, wapper.ErrorCode) {
+	var roleOwnedResourceData []models.RoleResource
+	err := d.DB.DBClient.Model(&models.RoleResource{}).Where("role_id = ?", roleId.RoleId).Find(&roleOwnedResourceData).Error
+	if err != nil {
+		return nil, wapper.GetRoleResourceFailed
+	}
+	return roleOwnedResourceData, wapper.Success
 }

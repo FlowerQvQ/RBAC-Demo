@@ -16,11 +16,14 @@ type ResourceListResp struct {
 	Total        int               `json:"total"` //总页数
 }
 
-//查询资源
+// 查询资源
+type ResourceGetReq struct {
+	Id int `json:"id" binding:"required"`
+}
 
 // 增加资源
 type ResourceCreateReq struct {
-	Pid         int    `form:"pid" json:"pid"`
+	Pid         int    `json:"pid"`
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
 	Path        string `json:"path"`
@@ -28,6 +31,19 @@ type ResourceCreateReq struct {
 	Status      int    `json:"status"`
 }
 
-//更新资源
+// 更新资源
+type ResourceUpdateReq struct {
+	Id          int    `json:"id" binding:"required"`
+	Pid         int    `json:"pid"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description"`
+	Path        string `json:"path" binding:"required"`
+	Type        int    `json:"type"`
+	Status      int    `json:"status"`
+	UpdateBy    string `json:"update_by"`
+}
 
-//删除资源
+// 删除资源
+type ResourceDelReq struct {
+	Id int `json:"id" binding:"required"`
+}

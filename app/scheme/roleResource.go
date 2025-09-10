@@ -6,3 +6,8 @@ type AddRoleResourceReq struct {
 	ResourceId []int  `json:"resource_id" binding:"required" `
 	CreatedBy  string `json:"created_by"`
 }
+
+// 查询角色拥有的资源列表
+type RoleOwnedResourceListReq struct {
+	RoleId int `json:"role_id" binding:"required"`
+}

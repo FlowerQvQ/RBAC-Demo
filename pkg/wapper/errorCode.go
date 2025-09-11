@@ -63,4 +63,5 @@ var (
 	TokenIsNull          = ErrorCode{Code: 80001, Message: "Token为空"}
 	AuthenticationFailed = ErrorCode{Code: 80002, Message: "认证失败（Token无效/过期）"}
 	PayLoadParsingFailed = ErrorCode{Code: 80003, Message: "载荷解析失败"}
+	GenerateTokenFailed  = ErrorCode{Code: 80004, Message: "Token生成失败"}
 )

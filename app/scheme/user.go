@@ -29,6 +29,13 @@ type UserLoginReq struct {
 	PasswordHash string `json:"password_hash" binding:"required,min=8,max=16"`
 }
 
+// 登录返回token结构体
+type LoginResp struct {
+	UserName string `json:"username"`
+	Email    string `json:"email"`
+	Token    string `json:"token"`
+}
+
 // 查询用户列表
 type UserListReq struct {
 	QueryName string `json:"queryName" biding:"omitempty"`

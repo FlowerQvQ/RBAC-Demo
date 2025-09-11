@@ -1,44 +1,12 @@
 package middleware
 
 import (
+	"NewProject/pkg/util"
 	"NewProject/pkg/wapper"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"time"
 )
-
-const SecretKey = "secret"
-
-type JWTToken struct {
-	Id                   int    `json:"id"`
-	Username             string `json:"username"`
-	jwt.RegisteredClaims        //嵌入jwt的注册声明
-}
-
-// 生成token
-func GenerateToken(jwtInfo JWTToken) (string, error) {
-	//1.定义Claims（载荷）
-	claims := JWTToken{
-		Id:       jwtInfo.Id,
-		Username: jwtInfo.Username,
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    jwtInfo.Username,                                   //发行者
-			Subject:   "token验证",                                          //设置主题
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), //设置过期时间
-			NotBefore: jwt.NewNumericDate(time.Now()),                     //设置生效时间
-			IssuedAt:  jwt.NewNumericDate(time.Now()),                     //设置发行时间
-		},
-	}
-	//2.创建token对象
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) //NewWithClaims()是初始化token结构体header并设置加密算法的
-	//3.使用秘钥签名并生成完整的token字符串
-	tokenString, err := token.SignedString([]byte(SecretKey)) //secret是设置的秘钥名，解析也需要用这个名字
-	if err != nil {
-		return "", err
-	}
-	return tokenString, nil //返回token字符串
-}
 
 // 验证token
 func ParseToken() gin.HandlerFunc {
@@ -52,7 +20,7 @@ func ParseToken() gin.HandlerFunc {
 		}
 		//解析token：解析JWT令牌并验证其签名
 		//ParseWithClaims()函数会自动判断token是否过期，不需要再写判断语句
-		token, err := jwt.ParseWithClaims(tokenString, &JWTToken{}, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, &util.JWTToken{}, func(token *jwt.Token) (interface{}, error) {
 			//确保方法是HMAC
 			_, ok := token.Method.(*jwt.SigningMethodHMAC)
 			if !ok {
@@ -61,7 +29,7 @@ func ParseToken() gin.HandlerFunc {
 				//token.Header["alg"]是JWT（JSON Web Token）头部中的一个字段，表示签名算法
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return []byte(SecretKey), nil
+			return []byte(util.SecretKey), nil
 		})
 		//如果令牌解析出错，返回错误响应
 		if err != nil {
@@ -69,7 +37,7 @@ func ParseToken() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if claims, ok := token.Claims.(*JWTToken); ok {
+		if claims, ok := token.Claims.(*util.JWTToken); ok {
 			c.Set("username", claims.Subject)
 			c.Set("userId", claims.ID)
 			c.Next()

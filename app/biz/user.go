@@ -20,6 +20,7 @@ func NewUserBiz(userData *data.UserData) *UserBiz {
 	}
 }
 
+// 注册
 func (b *UserBiz) Register(registerReq scheme.UserRegisterReq) (*models.User, wapper.ErrorCode) {
 	//把要用的变量定义在一起
 	var (
@@ -59,10 +60,11 @@ func (b *UserBiz) Register(registerReq scheme.UserRegisterReq) (*models.User, wa
 }
 
 // 登录
-func (b *UserBiz) Login(loginReq scheme.UserLoginReq) (models.User, wapper.ErrorCode) {
+func (b *UserBiz) Login(loginReq scheme.UserLoginReq) (scheme.LoginResp, wapper.ErrorCode) {
 	var (
-		err       error
 		userInfo  models.User
+		tokenInfo scheme.LoginResp
+		err       error
 		loginData = models.User{
 			PasswordHash: loginReq.PasswordHash,
 		}
@@ -70,27 +72,38 @@ func (b *UserBiz) Login(loginReq scheme.UserLoginReq) (models.User, wapper.Error
 	if loginReq.LoginName != "" {
 		userInfo, err = b.UserData.GetInfoByEmailOrUsername(loginReq.LoginName)
 		if err != nil {
-			return models.User{}, wapper.DataNotFound
+			return scheme.LoginResp{}, wapper.DataNotFound
 		}
 	} else {
-		return models.User{}, wapper.UsernameOrEmailIsNull
+		return scheme.LoginResp{}, wapper.UsernameOrEmailIsNull
 	}
 	if !util.CheckPassword(userInfo.PasswordHash, loginData.PasswordHash) {
-		return models.User{}, wapper.PasswordError
+		return scheme.LoginResp{}, wapper.PasswordError
 	}
 	//检查用户是否存在
 	if userInfo.Username == "" || userInfo.Email == "" {
-		return models.User{}, wapper.UserNotFound
+		return scheme.LoginResp{}, wapper.UserNotFound
 	}
 
 	if userInfo.IsActive == 0 {
-		return models.User{}, wapper.NotBeenActivated
+		return scheme.LoginResp{}, wapper.NotBeenActivated
 	}
 	err = b.UserData.Login(loginReq.LoginName)
 	if err != nil {
-		return models.User{}, wapper.LoginFailed
+		return scheme.LoginResp{}, wapper.LoginFailed
 	}
-	return userInfo, wapper.Success
+	needInfo := util.NeedInfo{
+		Id:       userInfo.Id,
+		Email:    userInfo.Email,
+		Username: userInfo.Username,
+	}
+	tokenInfo.Token, err = util.GenerateToken(needInfo)
+	if err != nil {
+		return scheme.LoginResp{}, wapper.GenerateTokenFailed
+	}
+	tokenInfo.Email = userInfo.Email
+	tokenInfo.UserName = userInfo.Username
+	return tokenInfo, wapper.Success
 }
 
 // 获取用户列表

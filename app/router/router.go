@@ -42,6 +42,7 @@ func (a *App) SetRouters(group *gin.RouterGroup) {
 	userGroup.DELETE("/delUser", a.UserService.DelUser)
 	//资源路由
 	resourceGroup := group.Group("/resourceOperation")
+	userGroup.Use(middleware.ParseToken()) //使用中间件验证token
 	resourceGroup.GET("/getResourceList", a.ResourceService.GetResourceList)
 	resourceGroup.GET("/getResource", a.ResourceService.GetResource)
 	resourceGroup.POST("/createResource", a.ResourceService.CreateResource)
@@ -49,6 +50,7 @@ func (a *App) SetRouters(group *gin.RouterGroup) {
 	resourceGroup.DELETE("/deleteResource", a.ResourceService.DelResource)
 	//角色路由
 	roleGroup := group.Group("/roleOperation")
+	userGroup.Use(middleware.ParseToken()) //使用中间件验证token
 	roleGroup.POST("addRole", a.RoleService.AddRole)
 	roleGroup.GET("getRole", a.RoleService.GetRole)
 	roleGroup.GET("getRoleList", a.RoleService.GetRoleList)
@@ -56,10 +58,12 @@ func (a *App) SetRouters(group *gin.RouterGroup) {
 	roleGroup.DELETE("delRole", a.RoleService.DelRole)
 	//角色--资源绑定
 	roleResourceGroup := group.Group("/roleResourceBindOperation")
+	userGroup.Use(middleware.ParseToken()) //使用中间件验证token
 	roleResourceGroup.POST("addRoleResourceBind", a.RoleResourceService.RoleResourceBind)
 	roleResourceGroup.GET("getRoleOwnedResourceList", a.RoleResourceService.GetRoleOwnedResourceList)
 	//用户--角色绑定
 	userRoleGroup := group.Group("/userRoleOperation")
+	userGroup.Use(middleware.ParseToken()) //使用中间件验证token
 	userRoleGroup.POST("addUserRole", a.UserRoleService.AddUserRole)
 	userRoleGroup.GET("userOwnedRole", a.UserRoleService.UserOwnedRole)
 	userRoleGroup.GET("userOwnedResource", a.UserRoleService.UserOwnedResource)

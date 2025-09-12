@@ -21,16 +21,10 @@ func NewUserBiz(userData *data.UserData) *UserBiz {
 }
 
 // 注册
-func (b *UserBiz) Register(registerReq scheme.UserRegisterReq) (*models.User, wapper.ErrorCode) {
+func (b *UserBiz) Register(registerReq models.User) (models.User, wapper.ErrorCode) {
 	//把要用的变量定义在一起
 	var (
-		err      error
-		userData = models.User{
-			Email:        registerReq.Email,
-			Username:     registerReq.Username,
-			PasswordHash: registerReq.PasswordHash,
-			IsActive:     scheme.UserActive,
-		}
+		err            error
 		userInfo       models.User
 		hashedPassword string
 		registerInfo   models.User
@@ -40,23 +34,29 @@ func (b *UserBiz) Register(registerReq scheme.UserRegisterReq) (*models.User, wa
 	//验证用户名是否存在
 	userInfo, err = b.UserData.GetInfoByUsername(registerReq.Username)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, wapper.DataNotFound
+		return models.User{}, wapper.DataNotFound
 	}
 	if userInfo.Username == registerReq.Username {
-		return nil, wapper.UsernameExisted
+		return models.User{}, wapper.UsernameExisted
 	}
 	//密码加密
 	hashedPassword, err = util.HashPassword(registerReq.PasswordHash)
 	if err != nil {
-		return nil, wapper.PasswordEncryptionFailed
+		return models.User{}, wapper.PasswordEncryptionFailed
+	}
+	userData := models.User{
+		Email:        registerReq.Email,
+		Username:     registerReq.Username,
+		PasswordHash: registerReq.PasswordHash,
+		IsActive:     scheme.UserActive,
+		CreatedBy:    registerReq.CreatedBy,
 	}
 	userData.PasswordHash = hashedPassword
-
 	registerInfo, err = b.UserData.Register(&userData)
 	if err != nil {
-		return nil, wapper.RegisterFailed
+		return models.User{}, wapper.RegisterFailed
 	}
-	return &registerInfo, wapper.Success
+	return registerInfo, wapper.Success
 }
 
 // 登录
@@ -132,7 +132,7 @@ func (b *UserBiz) GetUserInfo(userId scheme.GetUserInfoReq) (models.User, wapper
 // null=可以修改
 // 其余字段为空则不会被修改（gorm特性）
 
-func (b *UserBiz) UpdateUser(updateReq scheme.UserUpdateReq) (models.User, wapper.ErrorCode) {
+func (b *UserBiz) UpdateUser(updateUserInfo models.User) (models.User, wapper.ErrorCode) {
 	var (
 		err         error
 		updatedData models.User
@@ -143,39 +143,40 @@ func (b *UserBiz) UpdateUser(updateReq scheme.UserUpdateReq) (models.User, wappe
 		byUsernameInfo     models.User
 	)
 	//判断username是否为空，若不为空， 判断是否重复
-	if updateReq.Username != "" {
-		byUsernameInfo, err = b.UserData.GetInfoByUsername(updateReq.Username)
+	if updateUserInfo.Username != "" {
+		byUsernameInfo, err = b.UserData.GetInfoByUsername(updateUserInfo.Username)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.User{}, wapper.DataNotFound
 		}
-		if byUsernameInfo.Id > 0 && byUsernameInfo.Id != updateReq.Id {
+		if byUsernameInfo.Id > 0 && byUsernameInfo.Id != updateUserInfo.Id {
 			return models.User{}, wapper.UsernameExisted
 		}
 	}
 	//判断email是否为空，若不为空， 判断是否重复
-	if updateReq.Email != "" {
-		byEmailInfo, err = b.UserData.GetInfoByEmail(updateReq.Email)
+	if updateUserInfo.Email != "" {
+		byEmailInfo, err = b.UserData.GetInfoByEmail(updateUserInfo.Email)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return models.User{}, wapper.DataNotFound
 		}
-		if byEmailInfo.Id > 0 && byEmailInfo.Id != updateReq.Id {
+		if byEmailInfo.Id > 0 && byEmailInfo.Id != updateUserInfo.Id {
 			return models.User{}, wapper.EmailExisted
 		}
 	}
 	//若要修改密码（密码不为空），将密码重新加密
-	if updateReq.PasswordHash != "" {
-		hashedPasswordHash, err = util.HashPassword(updateReq.PasswordHash)
+	if updateUserInfo.PasswordHash != "" {
+		hashedPasswordHash, err = util.HashPassword(updateUserInfo.PasswordHash)
 		if err != nil {
 			return models.User{}, wapper.PasswordEncryptionFailed
 		}
 	}
 	//把要修改值的所有值赋给models.user
 	updatedData = models.User{
-		Id:           updateReq.Id,
-		Username:     updateReq.Username,
-		Email:        updateReq.Email,
+		Id:           updateUserInfo.Id,
+		Username:     updateUserInfo.Username,
+		Email:        updateUserInfo.Email,
 		PasswordHash: hashedPasswordHash,
-		IsActive:     updateReq.IsActive,
+		IsActive:     updateUserInfo.IsActive,
+		UpdatedBy:    updateUserInfo.UpdatedBy,
 	}
 	//把修改过后的model当做参数传给UpdateUser，然后调用数据库修改用户信息，并返回修改后的用户信息
 	userUpdateResp, err = b.UserData.UpdateUser(updatedData)

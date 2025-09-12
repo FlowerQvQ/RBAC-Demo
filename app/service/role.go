@@ -3,6 +3,7 @@ package service
 import (
 	"NewProject/app/biz"
 	"NewProject/app/scheme"
+	"NewProject/models"
 	"NewProject/pkg/wapper"
 	"github.com/gin-gonic/gin"
 )
@@ -60,12 +61,28 @@ func (s *RoleService) GetRole(c *gin.Context) {
 // 增加角色
 func (s *RoleService) AddRole(c *gin.Context) {
 	var (
-		roleInfo scheme.AddRoleReq
-		err      error
+		addRoleReq scheme.AddRoleReq
+		roleInfo   models.Role
+		err        error
 	)
-	err = c.ShouldBindJSON(&roleInfo)
+	err = c.ShouldBindJSON(&addRoleReq)
 	if err != nil {
 		wapper.ResError(c, wapper.ParameterBindingFailed)
+	}
+	usernameInterface, exists := c.Get("username")
+	if !exists {
+		wapper.ResError(c, wapper.GetUserNameFailed)
+		return
+	}
+	username, ok := usernameInterface.(string)
+	if !ok {
+		wapper.ResError(c, wapper.TypeAssertionFailed)
+		return
+	}
+	roleInfo = models.Role{
+		Name:        addRoleReq.Name,
+		Description: addRoleReq.Description,
+		CreatedBy:   username,
 	}
 	roleData, errCode := s.RoleBiz.AddRole(roleInfo)
 	if errCode != wapper.Success {
@@ -78,15 +95,33 @@ func (s *RoleService) AddRole(c *gin.Context) {
 // 修改角色
 func (s *RoleService) UpdateRole(c *gin.Context) {
 	var (
-		updateReq scheme.UpdateRoleReq
-		err       error
+		updateReq   scheme.UpdateRoleReq
+		err         error
+		updatedInfo models.Role
 	)
 	err = c.ShouldBindJSON(&updateReq)
 	if err != nil {
 		wapper.ResError(c, wapper.ParameterBindingFailed)
 		return
 	}
-	updatedData, errCode := s.RoleBiz.UpdateRole(updateReq)
+	usernameInfo, exists := c.Get("username")
+	if !exists {
+		wapper.ResError(c, wapper.GetUserNameFailed)
+		return
+	}
+	username, ok := usernameInfo.(string)
+	if !ok {
+		wapper.ResError(c, wapper.TypeAssertionFailed)
+		return
+	}
+	updatedInfo = models.Role{
+		Id:          updateReq.Id,
+		Name:        updateReq.Name,
+		Description: updateReq.Description,
+		Status:      updateReq.Status,
+		UpdatedBy:   username,
+	}
+	updatedData, errCode := s.RoleBiz.UpdateRole(updatedInfo)
 	if errCode != wapper.Success {
 		wapper.ResError(c, wapper.UpdateRoleFailed)
 		return

@@ -102,15 +102,17 @@ func (d *UserData) GetUserInfo(userId int64) (models.User, error) {
 
 // 更新用户信息--修改用户名，密码和邮箱和修改状态（传了值的修改，没传的不改，修改完密码要重新加密）
 
-func (d *UserData) UpdateUser(userData models.User) (models.User, error) {
+func (d *UserData) UpdateUser(updateUserInfo models.User) (models.User, error) {
 	var (
 		err error
 	)
-	err = d.DB.DBClient.Model(&models.User{}).Where("id = ? ", userData.Id).Updates(&userData).Error
+	err = d.DB.DBClient.Model(&models.User{}).Where("id = ? ", updateUserInfo.Id).Updates(&updateUserInfo).Error
 	if err != nil {
 		return models.User{}, err
 	}
-	return userData, nil
+	//先更新，再查询输出更新好的全部字段
+	err = d.DB.DBClient.Model(&models.User{}).Where("id = ?", updateUserInfo.Id).First(&updateUserInfo).Error
+	return updateUserInfo, nil
 }
 
 // 通过用户名获取数据库信息

@@ -40,7 +40,6 @@ type ResourceUpdateReq struct {
 	Path        string `json:"path" binding:"required"`
 	Type        int    `json:"type"`
 	Status      int    `json:"status"`
-	UpdateBy    string `json:"update_by"`
 }
 
 // 删除资源

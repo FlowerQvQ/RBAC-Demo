@@ -36,8 +36,8 @@ func (b *ResourceBiz) GetResource(resourceGetReq scheme.ResourceGetReq) (models.
 }
 
 // 增加资源
-func (b *ResourceBiz) CreateResource(createResourceReq scheme.ResourceCreateReq) (models.Resource, wapper.ErrorCode) {
-	createInfo, err := b.ResourceData.CreateResource(createResourceReq)
+func (b *ResourceBiz) CreateResource(addResourceInfo models.Resource) (models.Resource, wapper.ErrorCode) {
+	createInfo, err := b.ResourceData.CreateResource(addResourceInfo)
 	if err != nil {
 		return models.Resource{}, wapper.AddResourceFailed
 	}
@@ -45,8 +45,8 @@ func (b *ResourceBiz) CreateResource(createResourceReq scheme.ResourceCreateReq)
 }
 
 // 更新资源
-func (b *ResourceBiz) UpdateResource(updateResourceReq scheme.ResourceUpdateReq) (models.Resource, wapper.ErrorCode) {
-	updateData, err := b.ResourceData.UpdateResource(updateResourceReq)
+func (b *ResourceBiz) UpdateResource(updateResourceInfo models.Resource) (models.Resource, wapper.ErrorCode) {
+	updateData, err := b.ResourceData.UpdateResource(updateResourceInfo)
 	if err != wapper.Success {
 		return models.Resource{}, wapper.UpdateResourceFailed
 	}

@@ -16,7 +16,8 @@ var (
 	DataNotFound           = ErrorCode{Code: 10006, Message: "数据未找到"}
 	ParameterBindingFailed = ErrorCode{Code: 10007, Message: "参数绑定失败"}
 	GetTotalRecordsFailed  = ErrorCode{Code: 10008, Message: "获取记录总数失败"}
-
+	GetUserNameFailed      = ErrorCode{Code: 10009, Message: "获取用户名失败"}
+	TypeAssertionFailed    = ErrorCode{Code: 10010, Message: "类型断言失败"}
 	//注册模块
 	RegisterFailed           = ErrorCode{Code: 20001, Message: "用户注册失败"}
 	UsernameExisted          = ErrorCode{Code: 20002, Message: "用户已存在"}

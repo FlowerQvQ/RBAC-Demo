@@ -81,14 +81,15 @@ func (d *ResourceData) GetResource(resourceGetReq scheme.ResourceGetReq) (models
 }
 
 // 增加资源
-func (d *ResourceData) CreateResource(createResourceReq scheme.ResourceCreateReq) (models.Resource, error) {
+func (d *ResourceData) CreateResource(addResourceInfo models.Resource) (models.Resource, error) {
 	createResourceData := models.Resource{
-		Pid:         createResourceReq.Pid,
-		Name:        createResourceReq.Name,
-		Description: createResourceReq.Description,
-		Path:        createResourceReq.Path,
-		Type:        createResourceReq.Type,
-		Status:      createResourceReq.Status,
+		Pid:         addResourceInfo.Pid,
+		Name:        addResourceInfo.Name,
+		Description: addResourceInfo.Description,
+		Path:        addResourceInfo.Path,
+		Type:        addResourceInfo.Type,
+		Status:      addResourceInfo.Status,
+		CreatedBy:   addResourceInfo.CreatedBy,
 	}
 	err := d.DB.DBClient.Model(&models.Resource{}).Create(&createResourceData).Error
 	if err != nil {
@@ -98,23 +99,23 @@ func (d *ResourceData) CreateResource(createResourceReq scheme.ResourceCreateReq
 }
 
 // 更新资源
-func (d *ResourceData) UpdateResource(updateResourceReq scheme.ResourceUpdateReq) (models.Resource, wapper.ErrorCode) {
+func (d *ResourceData) UpdateResource(updateResourceInfo models.Resource) (models.Resource, wapper.ErrorCode) {
 	updateResourceData := models.Resource{
-		Id:          updateResourceReq.Id,
-		Pid:         updateResourceReq.Pid,
-		Name:        updateResourceReq.Name,
-		Description: updateResourceReq.Description,
-		Path:        updateResourceReq.Path,
-		Type:        updateResourceReq.Type,
-		Status:      updateResourceReq.Status,
-		UpdatedBy:   updateResourceReq.UpdateBy,
+		Id:          updateResourceInfo.Id,
+		Pid:         updateResourceInfo.Pid,
+		Name:        updateResourceInfo.Name,
+		Description: updateResourceInfo.Description,
+		Path:        updateResourceInfo.Path,
+		Type:        updateResourceInfo.Type,
+		Status:      updateResourceInfo.Status,
+		UpdatedBy:   updateResourceInfo.UpdatedBy,
 	}
-	err := d.DB.DBClient.Model(&models.Resource{}).Where("id = ?", updateResourceReq.Id).Updates(&updateResourceData).Error
+	err := d.DB.DBClient.Model(&models.Resource{}).Where("id = ?", updateResourceInfo.Id).Updates(&updateResourceData).Error
 	if err != nil {
 		return models.Resource{}, wapper.UpdateResourceFailed
 	}
 	var updateDResource models.Resource
-	err = d.DB.DBClient.Model(&models.Resource{}).Where("id = ?", updateResourceReq.Id).First(&updateDResource).Error
+	err = d.DB.DBClient.Model(&models.Resource{}).Where("id = ?", updateResourceInfo.Id).First(&updateDResource).Error
 	if err != nil {
 		return models.Resource{}, wapper.DataNotFound
 	}

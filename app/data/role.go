@@ -82,15 +82,15 @@ func (d *RoleData) GetRole(getRoleReq scheme.GetRoleReq) (models.Role, wapper.Er
 }
 
 // 增加角色
-func (d *RoleData) AddRole(roleInfo scheme.AddRoleReq) (models.Role, error) {
+func (d *RoleData) AddRole(addRoleInfo models.Role) (models.Role, error) {
 	var (
-		roleData = models.Role{}
+		roleData models.Role
 		err      error
 	)
 	roleData = models.Role{
-		Name:        roleInfo.Name,
-		Description: roleInfo.Description,
-		CreatedBy:   roleInfo.CreatedBy,
+		Name:        addRoleInfo.Name,
+		Description: addRoleInfo.Description,
+		CreatedBy:   addRoleInfo.CreatedBy,
 	}
 	err = d.DB.DBClient.Model(&models.Role{}).Create(&roleData).Error
 	if err != nil {
@@ -100,20 +100,20 @@ func (d *RoleData) AddRole(roleInfo scheme.AddRoleReq) (models.Role, error) {
 }
 
 // 更新角色信息
-func (d *RoleData) UpdateRole(updateRoleReq scheme.UpdateRoleReq) (models.Role, wapper.ErrorCode) {
+func (d *RoleData) UpdateRole(updateRoleInfo models.Role) (models.Role, wapper.ErrorCode) {
 	updatedRoleData := models.Role{
-		Id:          updateRoleReq.Id,
-		Name:        updateRoleReq.Name,
-		Description: updateRoleReq.Description,
-		Status:      updateRoleReq.Status,
-		UpdatedBy:   updateRoleReq.UpdateBy,
+		Id:          updateRoleInfo.Id,
+		Name:        updateRoleInfo.Name,
+		Description: updateRoleInfo.Description,
+		Status:      updateRoleInfo.Status,
+		UpdatedBy:   updateRoleInfo.UpdatedBy,
 	}
-	err := d.DB.DBClient.Model(&models.Role{}).Where("id = ?", updateRoleReq.Id).Updates(&updatedRoleData).Error
+	err := d.DB.DBClient.Model(&models.Role{}).Where("id = ?", updateRoleInfo.Id).Updates(&updatedRoleData).Error
 	if err != nil {
 		return models.Role{}, wapper.UpdateRoleFailed
 	}
 	var updatedRole models.Role
-	err = d.DB.DBClient.Model(&models.Role{}).Where("id = ?", updateRoleReq.Id).First(&updatedRole).Error
+	err = d.DB.DBClient.Model(&models.Role{}).Where("id = ?", updateRoleInfo.Id).First(&updatedRole).Error
 	if err != nil {
 		return models.Role{}, wapper.DataNotFound
 	}

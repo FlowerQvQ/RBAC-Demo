@@ -61,37 +61,79 @@ func (s *ResourceService) GetResource(c *gin.Context) {
 // 增加资源
 func (s *ResourceService) CreateResource(c *gin.Context) {
 	var (
-		CreateResource     scheme.ResourceCreateReq
+		createResource     scheme.ResourceCreateReq
 		err                error
 		errCode            wapper.ErrorCode
-		createResourceInfo models.Resource
+		createResourceData models.Resource
+		addResourceInfo    models.Resource
 	)
-	err = c.ShouldBindJSON(&CreateResource)
+	err = c.ShouldBindJSON(&createResource)
 	if err != nil {
 		wapper.ResError(c, wapper.ParameterBindingFailed)
 		return
 	}
-	createResourceInfo, errCode = s.ResourceBiz.CreateResource(CreateResource)
+	usernameInterface, exists := c.Get("username")
+	if !exists {
+		wapper.ResError(c, wapper.GetUserNameFailed)
+		return
+	}
+	username, ok := usernameInterface.(string)
+	if !ok {
+		wapper.ResError(c, wapper.TypeAssertionFailed)
+		return
+	}
+	addResourceInfo = models.Resource{
+		Pid:         createResource.Pid,
+		Name:        createResource.Name,
+		Description: createResource.Description,
+		Path:        createResource.Path,
+		Type:        createResource.Type,
+		Status:      createResource.Status,
+		CreatedBy:   username,
+	}
+
+	createResourceData, errCode = s.ResourceBiz.CreateResource(addResourceInfo)
 	if errCode != wapper.Success {
 		wapper.ResError(c, wapper.AddResourceFailed)
 		return
 	}
-	wapper.ResSuccess(c, createResourceInfo)
+	wapper.ResSuccess(c, createResourceData)
 
 }
 
 // 更新资源
 func (s *ResourceService) UpdateResource(c *gin.Context) {
 	var (
-		updateResourceReq scheme.ResourceUpdateReq
-		err               error
+		updateResourceReq  scheme.ResourceUpdateReq
+		err                error
+		updateResourceInfo models.Resource
 	)
 	err = c.ShouldBindJSON(&updateResourceReq)
 	if err != nil {
 		wapper.ResError(c, wapper.ParameterBindingFailed)
 		return
 	}
-	updateResourceData, errCode := s.ResourceBiz.UpdateResource(updateResourceReq)
+	usernameInterface, exists := c.Get("username")
+	if !exists {
+		wapper.ResError(c, wapper.GetUserNameFailed)
+		return
+	}
+	username, ok := usernameInterface.(string)
+	if !ok {
+		wapper.ResError(c, wapper.TypeAssertionFailed)
+		return
+	}
+	updateResourceInfo = models.Resource{
+		Id:          updateResourceReq.Id,
+		Pid:         updateResourceReq.Pid,
+		Name:        updateResourceReq.Name,
+		Description: updateResourceReq.Description,
+		Path:        updateResourceReq.Path,
+		Type:        updateResourceReq.Type,
+		Status:      updateResourceReq.Status,
+		UpdatedBy:   username,
+	}
+	updateResourceData, errCode := s.ResourceBiz.UpdateResource(updateResourceInfo)
 	if errCode != wapper.Success {
 		wapper.ResError(c, wapper.UpdateResourceFailed)
 		return

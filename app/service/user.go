@@ -22,10 +22,11 @@ func NewUserService(userBiz *biz.UserBiz) *UserService {
 
 func (s *UserService) Register(c *gin.Context) {
 	var (
-		registerReq scheme.UserRegisterReq
-		err         error
-		newUser     *models.User
-		errCode     wapper.ErrorCode
+		registerReq  scheme.UserRegisterReq
+		err          error
+		newUser      models.User
+		errCode      wapper.ErrorCode
+		registerInfo models.User
 	)
 	err = c.ShouldBindJSON(&registerReq)
 	if err != nil {
@@ -33,7 +34,13 @@ func (s *UserService) Register(c *gin.Context) {
 		return
 	}
 
-	newUser, errCode = s.UserBiz.Register(registerReq)
+	registerInfo = models.User{
+		Email:        registerReq.Email,
+		PasswordHash: registerReq.PasswordHash,
+		Username:     registerReq.Username,
+		CreatedBy:    registerReq.Username,
+	}
+	newUser, errCode = s.UserBiz.Register(registerInfo)
 	if errCode != wapper.Success {
 		wapper.ResError(c, errCode)
 		return
@@ -102,17 +109,36 @@ func (s *UserService) GetUserInfo(c *gin.Context) {
 
 func (s *UserService) UpdateUser(c *gin.Context) {
 	var (
-		err           error
-		updateUserReq scheme.UserUpdateReq
-		newUpdateInfo models.User
-		errCode       wapper.ErrorCode
+		err            error
+		updateUserReq  scheme.UserUpdateReq
+		newUpdateInfo  models.User
+		updateUserInfo models.User
+		errCode        wapper.ErrorCode
 	)
 	err = c.ShouldBindJSON(&updateUserReq)
 	if err != nil {
 		wapper.ResError(c, wapper.ParameterBindingFailed)
 		return
 	}
-	newUpdateInfo, errCode = s.UserBiz.UpdateUser(updateUserReq)
+	usernameInterface, exists := c.Get("username")
+	if !exists {
+		wapper.ResError(c, wapper.GetUserNameFailed)
+		return
+	}
+	username, ok := usernameInterface.(string)
+	if !ok {
+		wapper.ResError(c, wapper.TypeAssertionFailed)
+		return
+	}
+	updateUserInfo = models.User{
+		Id:           updateUserReq.Id,
+		Username:     updateUserReq.Username,
+		Email:        updateUserReq.Email,
+		PasswordHash: updateUserReq.PasswordHash,
+		IsActive:     updateUserReq.IsActive,
+		UpdatedBy:    username,
+	}
+	newUpdateInfo, errCode = s.UserBiz.UpdateUser(updateUserInfo)
 	if errCode != wapper.Success {
 		wapper.ResError(c, errCode)
 		return

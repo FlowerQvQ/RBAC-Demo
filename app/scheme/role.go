@@ -26,7 +26,6 @@ type GetRoleReq struct {
 type AddRoleReq struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
-	CreatedBy   string `json:"created_by"`
 }
 
 // 更新角色信息
@@ -35,7 +34,6 @@ type UpdateRoleReq struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
 	Status      int    `json:"status"`
-	UpdateBy    string `json:"update_by"`
 }
 
 // 删除角色信息

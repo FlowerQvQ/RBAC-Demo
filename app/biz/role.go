@@ -36,7 +36,7 @@ func (b *RoleBiz) GetRole(getRoleReq scheme.GetRoleReq) (models.Role, wapper.Err
 }
 
 // 增加角色
-func (b *RoleBiz) AddRole(roleInfo scheme.AddRoleReq) (models.Role, wapper.ErrorCode) {
+func (b *RoleBiz) AddRole(roleInfo models.Role) (models.Role, wapper.ErrorCode) {
 	roleData, err := b.RoleData.AddRole(roleInfo)
 	if err != nil {
 		return models.Role{}, wapper.AddRoleFailed
@@ -45,8 +45,8 @@ func (b *RoleBiz) AddRole(roleInfo scheme.AddRoleReq) (models.Role, wapper.Error
 }
 
 // 修改角色
-func (b *RoleBiz) UpdateRole(updateRoleReq scheme.UpdateRoleReq) (models.Role, wapper.ErrorCode) {
-	roleData, err := b.RoleData.UpdateRole(updateRoleReq)
+func (b *RoleBiz) UpdateRole(updateRoleInfo models.Role) (models.Role, wapper.ErrorCode) {
+	roleData, err := b.RoleData.UpdateRole(updateRoleInfo)
 	if err != wapper.Success {
 		return models.Role{}, wapper.UpdateRoleFailed
 	}

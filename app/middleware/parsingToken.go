@@ -9,7 +9,7 @@ import (
 )
 
 // 验证token
-func ParseToken() gin.HandlerFunc {
+func ParseTokenMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//从请求头重获取token
 		tokenString := c.GetHeader("Authorization") //Authorization用来接token，前端传递的时候也要用这个名字传递
@@ -37,9 +37,10 @@ func ParseToken() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
 		if claims, ok := token.Claims.(*util.JWTToken); ok {
-			c.Set("username", claims.Subject)
 			c.Set("userId", claims.ID)
+			c.Set("username", claims.Username)
 			c.Next()
 		} else {
 			wapper.ResError(c, wapper.PayLoadParsingFailed)

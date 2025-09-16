@@ -25,7 +25,23 @@ func (s *RoleResourceService) RoleResourceBind(c *gin.Context) {
 		wapper.ResError(c, wapper.AddResourceFailed)
 		return
 	}
-	bindData, errCode := s.RoleResourceBiz.RoleResourceBind(bindInfo)
+	usernameInterface, exists := c.Get("username")
+	if !exists {
+		wapper.ResError(c, wapper.GetUserNameFailed)
+		return
+	}
+	username, ok := usernameInterface.(string)
+	if !ok {
+		wapper.ResError(c, wapper.TypeAssertionFailed)
+		return
+	}
+	addRoleResourceInfo := scheme.AddRoleOwnedResourceInfo{
+		RoleId:     bindInfo.RoleId,
+		ResourceId: bindInfo.ResourceId,
+		CreatedBy:  username,
+	}
+
+	bindData, errCode := s.RoleResourceBiz.RoleResourceBind(addRoleResourceInfo)
 	if errCode != wapper.Success {
 		wapper.ResError(c, wapper.AddResourceFailed)
 		return
@@ -50,4 +66,23 @@ func (s *RoleResourceService) GetRoleOwnedResourceList(c *gin.Context) {
 		return
 	}
 	wapper.ResSuccess(c, roleOwnedResourceData)
+}
+
+// 批量删除角色拥有的资源
+func (s *RoleResourceService) DelRoleOwnedResource(c *gin.Context) {
+	var (
+		delRoleResourceInfo scheme.DelRoleOwnedResourceReq
+		err                 error
+	)
+	err = c.ShouldBindJSON(&delRoleResourceInfo)
+	if err != nil {
+		wapper.ResError(c, wapper.ParameterBindingFailed)
+		return
+	}
+	errCode := s.RoleResourceBiz.DelRoleOwnedResource(delRoleResourceInfo)
+	if errCode != wapper.Success {
+		wapper.ResError(c, wapper.DeleteRoleOwnedResourceFailed)
+		return
+	}
+	wapper.ResSuccess(c, "删除成功")
 }

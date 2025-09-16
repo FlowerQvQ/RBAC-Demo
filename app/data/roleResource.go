@@ -17,7 +17,7 @@ func NewRoleResourceData(data *Data) *RoleResourceData {
 }
 
 // 角色资源绑定
-func (d *RoleResourceData) RoleResourceBind(AddRoleResourceBind scheme.AddRoleResourceReq) ([]models.RoleResource, error) {
+func (d *RoleResourceData) RoleResourceBind(AddRoleResourceBind scheme.AddRoleOwnedResourceInfo) ([]models.RoleResource, error) {
 	var (
 		bindData []models.RoleResource
 		err      error
@@ -27,7 +27,6 @@ func (d *RoleResourceData) RoleResourceBind(AddRoleResourceBind scheme.AddRoleRe
 			RoleId:     AddRoleResourceBind.RoleId,
 			ResourceId: resourceId,
 			CreatedBy:  AddRoleResourceBind.CreatedBy,
-			Status:     1,
 		})
 	}
 	err = d.DB.DBClient.Model(&models.RoleResource{}).CreateInBatches(bindData, 10).Error
@@ -45,4 +44,18 @@ func (d *RoleResourceData) GetRoleOwnedResourceList(roleId scheme.RoleOwnedResou
 		return nil, wapper.GetRoleResourceFailed
 	}
 	return roleOwnedResourceData, wapper.Success
+}
+
+// 批量删除角色拥有的资源
+func (d *RoleResourceData) DelRoleOwnedResource(delRoleResourceInfo scheme.DelRoleOwnedResourceReq) wapper.ErrorCode {
+	if delRoleResourceInfo.RoleId <= 0 || len(delRoleResourceInfo.ResourceId) == 0 {
+		return wapper.DeleteDataFailed
+	}
+	err := d.DB.DBClient.Model(&models.RoleResource{}).
+		Where("role_id = ? AND resource_id IN ?", delRoleResourceInfo.RoleId, delRoleResourceInfo.ResourceId).
+		Delete(&models.RoleResource{}).Error
+	if err != nil {
+		return wapper.DeleteRoleOwnedResourceFailed
+	}
+	return wapper.Success
 }

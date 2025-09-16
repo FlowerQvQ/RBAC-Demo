@@ -25,7 +25,22 @@ func (s *UserRoleService) AddUserRole(c *gin.Context) {
 		wapper.ResError(c, wapper.ParameterBindingFailed)
 		return
 	}
-	addUserRoleData, errCode := s.userRoleBiz.AddUserRole(addUserRole)
+	usernameInterface, exists := c.Get("username")
+	if !exists {
+		wapper.ResError(c, wapper.GetUserNameFailed)
+		return
+	}
+	username, ok := usernameInterface.(string)
+	if !ok {
+		wapper.ResError(c, wapper.TypeAssertionFailed)
+		return
+	}
+	addUserRoleInfo := scheme.GetUsernameReq{
+		UserId:    addUserRole.UserId,
+		RoleId:    addUserRole.RoleId,
+		CreatedBy: username,
+	}
+	addUserRoleData, errCode := s.userRoleBiz.AddUserRole(addUserRoleInfo)
 	if errCode != wapper.Success {
 		wapper.ResError(c, wapper.AddUserRoleFailed)
 		return
@@ -69,4 +84,22 @@ func (s *UserRoleService) UserOwnedResource(c *gin.Context) {
 		return
 	}
 	wapper.ResSuccess(c, UserOwnedResourceData)
+}
+
+// 删除用户拥有的角色
+func (s *UserRoleService) DelUserRole(c *gin.Context) {
+	var (
+		delId scheme.DelUserOwnedRoleReq
+		err   error
+	)
+	err = c.ShouldBindJSON(&delId)
+	if err != nil {
+		wapper.ResError(c, wapper.ParameterBindingFailed)
+	}
+	errCode := s.userRoleBiz.DelUserRole(delId)
+	if errCode != wapper.Success {
+		wapper.ResError(c, wapper.DelUserRoleFailed)
+		return
+	}
+	wapper.ResSuccess(c, "删除成功")
 }

@@ -18,7 +18,7 @@ func NewRoleResourceBiz(roleResourceData *data.RoleResourceData) *RoleResourceBi
 }
 
 // 角色资源绑定
-func (b *RoleResourceBiz) RoleResourceBind(AddRoleResourceBind scheme.AddRoleResourceReq) ([]models.RoleResource, wapper.ErrorCode) {
+func (b *RoleResourceBiz) RoleResourceBind(AddRoleResourceBind scheme.AddRoleOwnedResourceInfo) ([]models.RoleResource, wapper.ErrorCode) {
 	bindData, errCode := b.RoleResourceData.RoleResourceBind(AddRoleResourceBind)
 	if errCode != nil {
 		return nil, wapper.RoleResourceBindFailed
@@ -33,4 +33,13 @@ func (b *RoleResourceBiz) GetRoleOwnedResourceList(roleId scheme.RoleOwnedResour
 		return nil, wapper.GetRoleResourceFailed
 	}
 	return roleOwnedResourceData, wapper.Success
+}
+
+// 批量删除角色拥有的资源
+func (b *RoleResourceBiz) DelRoleOwnedResource(delRoleResourceInfo scheme.DelRoleOwnedResourceReq) wapper.ErrorCode {
+	err := b.RoleResourceData.DelRoleOwnedResource(delRoleResourceInfo)
+	if err != wapper.Success {
+		return wapper.DeleteRoleOwnedResourceFailed
+	}
+	return wapper.Success
 }

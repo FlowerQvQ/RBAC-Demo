@@ -17,7 +17,7 @@ func NewRoleUserData(data *Data) *UserRoleData {
 }
 
 // 给用户授权角色
-func (d *UserRoleData) AddUserRole(addUserRole scheme.AddUserRoleReq) ([]models.UserRole, error) {
+func (d *UserRoleData) AddUserRole(addUserRole scheme.GetUsernameReq) ([]models.UserRole, error) {
 	var (
 		addUserRoleData []models.UserRole
 		err             error
@@ -27,7 +27,6 @@ func (d *UserRoleData) AddUserRole(addUserRole scheme.AddUserRoleReq) ([]models.
 			UserId:    addUserRole.UserId,
 			RoleId:    roleId,
 			CreatedBy: addUserRole.CreatedBy,
-			Status:    addUserRole.Status,
 		})
 	}
 	err = d.DB.DBClient.Model(&models.UserRole{}).CreateInBatches(addUserRoleData, 10).Error
@@ -79,6 +78,10 @@ func (d *UserRoleData) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme
 	if err != nil {
 		return scheme.UserOwnedResourceResp{}, err
 	}
+	//遍历资源列表中的每个resource
+	//检查resource中是否存在"path"字段
+	//验证path值是否为字符串类型且非空
+	//符合条件的路径被追加到pathList中
 	for _, resource := range resourceList {
 		if pathVal, exists := resource["path"]; exists {
 			if path, ok := pathVal.(string); ok && path != "" {
@@ -90,4 +93,18 @@ func (d *UserRoleData) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme
 	userOwnedRoleData.Resources = resourceList
 	userOwnedRoleData.Path = pathList
 	return userOwnedRoleData, nil
+}
+
+// 删除用户拥有的角色
+func (d *UserRoleData) DelUserRole(delId scheme.DelUserOwnedRoleReq) wapper.ErrorCode {
+	if delId.UserId <= 0 || len(delId.RoleId) == 0 {
+		return wapper.ParameterMissing
+	}
+	err := d.DB.DBClient.Model(&models.UserRole{}).
+		Where("user_id = ? AND role_id IN ?", delId.UserId, delId.RoleId).
+		Delete(&models.UserRole{}).Error
+	if err != nil {
+		return wapper.DelUserRoleFailed
+	}
+	return wapper.Success
 }

@@ -56,17 +56,20 @@ func (a *App) SetRouters(group *gin.RouterGroup) {
 	roleGroup.GET("getRoleList", a.RoleService.GetRoleList)
 	roleGroup.PUT("updateRole", a.RoleService.UpdateRole)
 	roleGroup.DELETE("delRole", a.RoleService.DelRole)
-	//角色--资源绑定
-	roleResourceGroup := group.Group("/roleResourceBindOperation")
-	roleResourceGroup.Use(middleware.ParseTokenMiddleWare()) //使用中间件验证token
-	roleResourceGroup.POST("addRoleResourceBind", a.RoleResourceService.RoleResourceBind)
-	roleResourceGroup.GET("getRoleOwnedResourceList", a.RoleResourceService.GetRoleOwnedResourceList)
 	//用户--角色绑定
 	userRoleGroup := group.Group("/userRoleOperation")
 	userRoleGroup.Use(middleware.ParseTokenMiddleWare()) //使用中间件验证token
 	userRoleGroup.POST("addUserRole", a.UserRoleService.AddUserRole)
 	userRoleGroup.GET("userOwnedRole", a.UserRoleService.UserOwnedRole)
 	userRoleGroup.GET("userOwnedResource", a.UserRoleService.UserOwnedResource)
+	userRoleGroup.DELETE("delUserOwnedRole", a.UserRoleService.DelUserRole)
+	//角色--资源绑定
+	roleResourceGroup := group.Group("/roleResourceBindOperation")
+	roleResourceGroup.Use(middleware.ParseTokenMiddleWare()) //使用中间件验证token
+	roleResourceGroup.POST("addRoleResourceBind", a.RoleResourceService.RoleResourceBind)
+	roleResourceGroup.GET("getRoleOwnedResourceList", a.RoleResourceService.GetRoleOwnedResourceList)
+	roleResourceGroup.DELETE("delRoleOwnedResource", a.RoleResourceService.DelRoleOwnedResource)
+
 }
 
 func InitGenEngine(app *App) *gin.Engine {

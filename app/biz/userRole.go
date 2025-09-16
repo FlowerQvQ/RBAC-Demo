@@ -18,7 +18,7 @@ func NewUserRoleBiz(userRoleData *data.UserRoleData) *UserRoleBiz {
 }
 
 // 给用户授权角色
-func (b *UserRoleBiz) AddUserRole(addUserRole scheme.AddUserRoleReq) ([]models.UserRole, wapper.ErrorCode) {
+func (b *UserRoleBiz) AddUserRole(addUserRole scheme.GetUsernameReq) ([]models.UserRole, wapper.ErrorCode) {
 	addUserRoleData, err := b.userRoleData.AddUserRole(addUserRole)
 	if err != nil {
 		return nil, wapper.AddUserRoleFailed
@@ -42,4 +42,13 @@ func (b *UserRoleBiz) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme.
 		return scheme.UserOwnedResourceResp{}, wapper.GetResourceListFailed
 	}
 	return UserOwnedResourceData, wapper.Success
+}
+
+// 删除用户拥有的角色
+func (b *UserRoleBiz) DelUserRole(delId scheme.DelUserOwnedRoleReq) wapper.ErrorCode {
+	err := b.userRoleData.DelUserRole(delId)
+	if err != wapper.Success {
+		return wapper.DelUserRoleFailed
+	}
+	return wapper.Success
 }

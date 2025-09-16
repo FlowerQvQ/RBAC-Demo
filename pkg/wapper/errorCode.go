@@ -18,6 +18,7 @@ var (
 	GetTotalRecordsFailed  = ErrorCode{Code: 10008, Message: "获取记录总数失败"}
 	GetUserNameFailed      = ErrorCode{Code: 10009, Message: "获取用户名失败"}
 	TypeAssertionFailed    = ErrorCode{Code: 10010, Message: "类型断言失败"}
+	DeleteDataFailed       = ErrorCode{Code: 10011, Message: "数据删除失败"}
 	//注册模块
 	RegisterFailed           = ErrorCode{Code: 20001, Message: "用户注册失败"}
 	UsernameExisted          = ErrorCode{Code: 20002, Message: "用户已存在"}
@@ -50,12 +51,14 @@ var (
 	UpdateRoleFailed  = ErrorCode{Code: 40004, Message: "角色更新失败"}
 	DelRoleFailed     = ErrorCode{Code: 400045, Message: "角色删除失败"}
 	//角色-资源模块
-	RoleResourceBindFailed = ErrorCode{Code: 50001, Message: "角色资源绑定失败"}
-	AddRoleResourceFailed  = ErrorCode{Code: 50002, Message: "角色资源添加失败"}
-	GetRoleResourceFailed  = ErrorCode{Code: 50003, Message: "查询角色拥有的资源失败"}
+	RoleResourceBindFailed        = ErrorCode{Code: 50001, Message: "角色资源绑定失败"}
+	AddRoleResourceFailed         = ErrorCode{Code: 50002, Message: "角色资源添加失败"}
+	GetRoleResourceFailed         = ErrorCode{Code: 50003, Message: "查询角色拥有的资源失败"}
+	DeleteRoleOwnedResourceFailed = ErrorCode{Code: 50004, Message: "删除角色拥有的资源失败"}
 	//用户-角色模块
-	AddUserRoleFailed = ErrorCode{Code: 60001, Message: "用户角色添加失败"}
-	GetUserRoleFailed = ErrorCode{Code: 60002, Message: "查询用户拥有的角色失败"}
+	AddUserRoleFailed = ErrorCode{Code: 60001, Message: "给用户添加角色--添加失败"}
+	GetUserRoleFailed = ErrorCode{Code: 60002, Message: "查询用户拥有的角色--查询失败"}
+	DelUserRoleFailed = ErrorCode{Code: 60003, Message: "删除用户拥有的角色--删除失败"}
 
 	//用户拥有的角色权限列表
 	GrtUserResourceFailed = ErrorCode{Code: 70001, Message: "查询角色拥有的资源失败"}

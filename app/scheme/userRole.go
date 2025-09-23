@@ -26,7 +26,7 @@ type UserOwnedRoleReq struct {
 }
 
 type UserOwnedResourceResp struct {
-	Resources []map[string]interface{} `json:"role_id"`
+	Resources []map[string]interface{} `json:"resources"`
 	Path      []string                 `json:"path"`
 }
 

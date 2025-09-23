@@ -4,15 +4,20 @@ import (
 	"NewProject/app/scheme"
 	"NewProject/models"
 	"NewProject/pkg/wapper"
+	"context"
+	"encoding/json"
+	"fmt"
 )
 
 type UserRoleData struct {
-	DB *Data
+	DB      *Data
+	RedisDB *RedisData
 }
 
-func NewRoleUserData(data *Data) *UserRoleData {
+func NewRoleUserData(mysqlDB *Data, redisDB *RedisData) *UserRoleData {
 	return &UserRoleData{
-		DB: data,
+		DB:      mysqlDB,
+		RedisDB: redisDB,
 	}
 }
 
@@ -37,19 +42,40 @@ func (d *UserRoleData) AddUserRole(addUserRole scheme.GetUsernameReq) ([]models.
 }
 
 // 查询用户拥有的角色列表
-func (D *UserRoleData) UserOwnedRole(userId scheme.GetUserOwnedRoleReq) ([]models.UserRole, wapper.ErrorCode) {
+func (d *UserRoleData) UserOwnedRole(userId scheme.GetUserOwnedRoleReq) ([]models.UserRole, wapper.ErrorCode) {
 	var (
 		userOwnedRoleData []models.UserRole
+		err               error
+		cached            string
 	)
-	err := D.DB.DBClient.Model(&models.UserRole{}).Where("user_id = ?", userId.UserId).Find(&userOwnedRoleData).Error
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf("userOwnedRole:%d", userId.UserId)
+
+	cached, err = d.RedisDB.RedisClient.Get(ctx, cacheKey).Result()
+	if err == nil {
+		//添加日志查看Redis中存储的数据
+		fmt.Printf("Redis cached data: %s\n", cached)
+
+		var parsedData []models.UserRole
+		if json.Unmarshal([]byte(cached), &parsedData) == nil {
+			return parsedData, wapper.Success
+		}
+	}
+	//缓存中没有，则从数据库获取
+	err = d.DB.DBClient.Model(&models.UserRole{}).Where("user_id = ?", userId.UserId).Find(&userOwnedRoleData).Error
 	if err != nil {
 		return nil, wapper.GetUserRoleFailed
+	}
+	//从数据库获取后，存入redis，并设置过期时间
+	redisData, err := json.Marshal(userOwnedRoleData)
+	if err == nil {
+		d.RedisDB.RedisClient.Set(ctx, cacheKey, redisData, 0) //设置过期时间，0为永不过期，角色变更时手动删除
 	}
 	return userOwnedRoleData, wapper.Success
 }
 
 // 查询用户拥有的资源列表
-func (d *UserRoleData) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme.UserOwnedResourceResp, error) {
+func (d *UserRoleData) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme.UserOwnedResourceResp, wapper.ErrorCode) {
 	var (
 		roleIDs           []int
 		pathList          []string
@@ -57,12 +83,23 @@ func (d *UserRoleData) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme
 		err               error
 		userOwnedRoleData scheme.UserOwnedResourceResp
 	)
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf("userOwnedResource:%d", userId.UserId)
+	////尝试从Redis获取
+	cached, err := d.RedisDB.RedisClient.Get(ctx, cacheKey).Result()
+	if err == nil {
+		var cachedResp scheme.UserOwnedResourceResp
+		if json.Unmarshal([]byte(cached), &cachedResp) == nil {
+			return cachedResp, wapper.Success
+		}
+	}
+	//缓存中没有，则从数据库获取,并存入redis
 	err = d.DB.DBClient.Model(&models.UserRole{}).Where("user_id = ?", userId.UserId).Pluck("role_id", &roleIDs).Error
 	if err != nil {
-		return scheme.UserOwnedResourceResp{}, err
+		return scheme.UserOwnedResourceResp{}, wapper.GetUserIdFailed
 	}
 	if len(roleIDs) == 0 {
-		return scheme.UserOwnedResourceResp{}, nil
+		return scheme.UserOwnedResourceResp{}, wapper.ThisUserHasNoRole
 	}
 
 	// 查询用户通过角色关联的资源信息
@@ -76,7 +113,7 @@ func (d *UserRoleData) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme
 			roleIDs, scheme.StatusOK, scheme.StatusOK).
 		Scan(&resourceList).Error
 	if err != nil {
-		return scheme.UserOwnedResourceResp{}, err
+		return scheme.UserOwnedResourceResp{}, wapper.GetUserResourceFailed
 	}
 	//遍历资源列表中的每个resource
 	//检查resource中是否存在"path"字段
@@ -89,14 +126,24 @@ func (d *UserRoleData) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme
 			}
 		}
 	}
-
 	userOwnedRoleData.Resources = resourceList
 	userOwnedRoleData.Path = pathList
-	return userOwnedRoleData, nil
+	//存入Redis
+	redisData, err := json.Marshal(resourceList)
+	if err == nil {
+		d.RedisDB.RedisClient.Set(ctx, cacheKey, redisData, 0) //设置过期时间，0为永不过期，角色变更时手动删除
+	}
+
+	return userOwnedRoleData, wapper.Success
 }
 
 // 删除用户拥有的角色
 func (d *UserRoleData) DelUserRole(delId scheme.DelUserOwnedRoleReq) wapper.ErrorCode {
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf("user_role:%d", delId.UserId)
+	//删除缓存
+	d.RedisDB.RedisClient.Del(ctx, cacheKey)
+
 	if delId.UserId <= 0 || len(delId.RoleId) == 0 {
 		return wapper.ParameterMissing
 	}

@@ -17,20 +17,21 @@ import (
 // Injectors from wire.go:
 
 func InitApp() *gin.Engine {
-	dataData := data.NewData()
-	userData := data.NewUserData(dataData)
+	mysqlData := data.NewData()
+	userData := data.NewUserData(mysqlData)
 	userBiz := biz.NewUserBiz(userData)
 	userService := service.NewUserService(userBiz)
-	resourceData := data.NewResourceData(dataData)
+	resourceData := data.NewResourceData(mysqlData)
 	resourceBiz := biz.NewResourceBiz(resourceData)
 	resourceService := service.NewResourceService(resourceBiz)
-	roleData := data.NewRoleData(dataData)
+	roleData := data.NewRoleData(mysqlData)
 	roleBiz := biz.NewRoleBiz(roleData)
 	roleService := service.NewRoleService(roleBiz)
-	roleResourceData := data.NewRoleResourceData(dataData)
+	redisData := data.NewRedisData()
+	roleResourceData := data.NewRoleResourceData(mysqlData, redisData)
 	roleResourceBiz := biz.NewRoleResourceBiz(roleResourceData)
 	roleResourceService := service.NewRoleResourceService(roleResourceBiz)
-	userRoleData := data.NewRoleUserData(dataData)
+	userRoleData := data.NewRoleUserData(mysqlData, redisData)
 	userRoleBiz := biz.NewUserRoleBiz(userRoleData)
 	userRoleService := service.NewUserRoleService(userRoleBiz)
 	app := &router.App{

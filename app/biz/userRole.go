@@ -38,7 +38,7 @@ func (b *UserRoleBiz) UserOwnedRole(userId scheme.GetUserOwnedRoleReq) ([]models
 // 查询用户拥有的资源列表
 func (b *UserRoleBiz) UserOwnedResource(userId scheme.UserOwnedRoleReq) (scheme.UserOwnedResourceResp, wapper.ErrorCode) {
 	UserOwnedResourceData, err := b.userRoleData.UserOwnedResource(userId)
-	if err != nil {
+	if err != wapper.Success {
 		return scheme.UserOwnedResourceResp{}, wapper.GetResourceListFailed
 	}
 	return UserOwnedResourceData, wapper.Success

@@ -1,13 +1,17 @@
 package data
 
 import (
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
+//mysql数据库连接配置
+
 type Data struct {
 	DBClient *gorm.DB
+	RedisDB  *RedisData
 }
 
 func NewData() *Data {
@@ -27,6 +31,29 @@ func MysqlClient() *gorm.DB {
 	if err != nil {
 		panic("数据库连接失败: " + err.Error())
 	}
-
 	return db
+}
+
+// redis连接配置
+
+type RedisData struct {
+	RedisClient *redis.Client
+}
+
+func NewRedisData() *RedisData {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+	return &RedisData{
+		RedisClient: rdb,
+	}
+}
+
+func (r *RedisData) Close() {
+	err := r.RedisClient.Close()
+	if err != nil {
+		panic("redis关闭失败: " + err.Error())
+	}
 }

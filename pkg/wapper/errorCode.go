@@ -56,9 +56,12 @@ var (
 	GetRoleResourceFailed         = ErrorCode{Code: 50003, Message: "查询角色拥有的资源失败"}
 	DeleteRoleOwnedResourceFailed = ErrorCode{Code: 50004, Message: "删除角色拥有的资源失败"}
 	//用户-角色模块
-	AddUserRoleFailed = ErrorCode{Code: 60001, Message: "给用户添加角色--添加失败"}
-	GetUserRoleFailed = ErrorCode{Code: 60002, Message: "查询用户拥有的角色--查询失败"}
-	DelUserRoleFailed = ErrorCode{Code: 60003, Message: "删除用户拥有的角色--删除失败"}
+	AddUserRoleFailed     = ErrorCode{Code: 60001, Message: "给用户添加角色--添加失败"}
+	GetUserRoleFailed     = ErrorCode{Code: 60002, Message: "查询用户拥有的角色--查询失败"}
+	GetUserIdFailed       = ErrorCode{Code: 60005, Message: "查询用户Id失败"}
+	DelUserRoleFailed     = ErrorCode{Code: 60003, Message: "删除用户拥有的角色--删除失败"}
+	ThisUserHasNoRole     = ErrorCode{Code: 60004, Message: "该用户没有角色"}
+	GetUserResourceFailed = ErrorCode{Code: 60006, Message: "查询用户拥有的资源--查询失败"}
 
 	//用户拥有的角色权限列表
 	GrtUserResourceFailed = ErrorCode{Code: 70001, Message: "查询角色拥有的资源失败"}
